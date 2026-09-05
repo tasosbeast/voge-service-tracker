@@ -104,6 +104,7 @@ const STORAGE_KEY = "bikeData";
 const updateServiceButton = document.querySelector("#update-btn");
 const offRoadCheckButton = document.querySelector("#off-road-check-btn");
 const offRoadDialog = document.querySelector("#off-road-dialog");
+const dialogContent = offRoadDialog.querySelector(".dialog-content");
 const closeOffRoadDialogButton = document.querySelector("#close-off-road-dialog");
 const offRoadChecklist = document.querySelector("#off-road-checklist");
 const offRoadSuccess = document.querySelector("#off-road-success");
@@ -112,6 +113,7 @@ const remainingKmElement = document.querySelector("#remaining-km");
 const nextServiceText = document.querySelector("#next-service");
 const serviceTasks = document.querySelector("#service-tasks");
 const tasksTitle = document.querySelector("#tasks-title");
+let offRoadCloseTimeoutId = null;
 
 renderOffRoadChecks();
 loadBikeData();
@@ -127,20 +129,46 @@ closeOffRoadDialogButton.addEventListener("click", () => {
   offRoadDialog.close();
 });
 
-offRoadDialog.addEventListener("close", resetOffRoadChecks);
+offRoadDialog.addEventListener("click", (event) => {
+  const contentBounds = dialogContent.getBoundingClientRect();
+  const clickedOutsideContent =
+    event.clientX < contentBounds.left ||
+    event.clientX > contentBounds.right ||
+    event.clientY < contentBounds.top ||
+    event.clientY > contentBounds.bottom;
+
+  if (event.target === offRoadDialog && clickedOutsideContent) {
+    offRoadDialog.close();
+  }
+});
+
+offRoadDialog.addEventListener("close", () => {
+  clearOffRoadCloseTimeout();
+  resetOffRoadChecks();
+  offRoadSuccess.textContent = "";
+});
 
 offRoadChecklist.addEventListener("change", (event) => {
   if (!event.target.matches('input[type="checkbox"]')) {
     return;
   }
 
-  if (areAllOffRoadChecksComplete()) {
-    offRoadSuccess.textContent = "Off-road check completed.";
-
-    setTimeout(() => {
-      offRoadDialog.close();
-    }, 800);
+  if (!areAllOffRoadChecksComplete()) {
+    clearOffRoadCloseTimeout();
+    offRoadSuccess.textContent = "";
+    return;
   }
+
+  offRoadSuccess.textContent = "Off-road check completed.";
+
+  clearOffRoadCloseTimeout();
+  offRoadCloseTimeoutId = setTimeout(() => {
+    offRoadCloseTimeoutId = null;
+
+    if (offRoadDialog.open && areAllOffRoadChecksComplete()) {
+      offRoadDialog.close();
+    }
+  }, 800);
 });
 
 kmInput.addEventListener("keydown", (event) => {
@@ -193,6 +221,13 @@ function resetOffRoadChecks() {
   offRoadChecklist.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
     checkbox.checked = false;
   });
+}
+
+function clearOffRoadCloseTimeout() {
+  if (offRoadCloseTimeoutId !== null) {
+    clearTimeout(offRoadCloseTimeoutId);
+    offRoadCloseTimeoutId = null;
+  }
 }
 
 function areAllOffRoadChecksComplete() {
