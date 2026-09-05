@@ -97,6 +97,7 @@ const undoServiceButton = document.querySelector("#undo-service-btn");
 const serviceHistory = document.querySelector("#service-history");
 const historyFeedback = document.querySelector("#history-feedback");
 let offRoadCloseTimeoutId = null;
+let historyFeedbackTimeoutId = null;
 
 renderOffRoadChecks();
 loadBikeData();
@@ -269,9 +270,21 @@ function undoLastService() {
 }
 
 function showHistoryFeedback(message, type) {
+  clearHistoryFeedback();
   historyFeedback.textContent = message;
-  historyFeedback.classList.remove("error", "success");
   historyFeedback.classList.add(type);
+
+  historyFeedbackTimeoutId = setTimeout(clearHistoryFeedback, 3000);
+}
+
+function clearHistoryFeedback() {
+  if (historyFeedbackTimeoutId !== null) {
+    clearTimeout(historyFeedbackTimeoutId);
+    historyFeedbackTimeoutId = null;
+  }
+
+  historyFeedback.textContent = "";
+  historyFeedback.classList.remove("error", "success");
 }
 
 function escapeHtml(value) {
