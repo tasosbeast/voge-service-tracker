@@ -1,78 +1,52 @@
-const SERVICES = [
-  {
-    title: "1,000 km service",
-    km: 1000,
-    tasks: [
-      "Change engine oil",
-      "Replace oil filter",
-      "Inspect and lubricate drive chain",
-      "Check battery and electrical system",
-      "Inspect brakes",
-      "Check wheels and tires",
-      "Tighten bolts and fasteners",
-      "Inspect steering system",
-    ],
-  },
-  {
-    title: "4,000 km service",
-    km: 4000,
-    tasks: [
-      "Change engine oil",
-      "Replace oil filter",
-      "Check throttle operation",
-      "Inspect/adjust cam chain",
-      "Inspect fuel system",
-      "Check/adjust clutch",
-      "Inspect and lubricate drive chain",
-      "Clean air filter",
-      "Check battery and electrical system",
-      "Inspect brakes",
-      "Check wheels and tires",
-      "Tighten bolts and fasteners",
-      "Inspect steering system",
-    ],
-  },
-  {
-    title: "8,000 km service",
-    km: 8000,
-    tasks: [
-      "Change engine oil",
-      "Replace oil filter",
-      "Check throttle operation",
-      "Inspect/adjust cam chain",
-      "Inspect fuel system",
-      "Check/adjust clutch",
-      "Inspect and lubricate drive chain",
-      "Replace air filter",
-      "Check battery and electrical system",
-      "Inspect brakes",
-      "Check wheels and tires",
-      "Tighten bolts and fasteners",
-      "Inspect steering system",
-    ],
-  },
-  {
-    title: "12,000 km service",
-    km: 12000,
-    tasks: [
-      "Change engine oil",
-      "Replace oil filter",
-      "Replace spark plug",
-      "Check/adjust valve clearance",
-      "Inspect/adjust cam chain",
-      "Inspect fuel system",
-      "Replace fuel filter",
-      "Run diagnostic check on throttle body / fuel injection system",
-      "Check/adjust clutch",
-      "Inspect and lubricate drive chain",
-      "Clean air filter",
-      "Check battery and electrical system",
-      "Inspect brakes",
-      "Check wheels and tires",
-      "Tighten bolts and fasteners",
-      "Inspect steering system",
-    ],
-  },
+const FIRST_SERVICE_KM = 1000;
+const SERVICE_INTERVAL_KM = 4000;
+const AIR_FILTER_REPLACEMENT_INTERVAL_KM = 8000;
+const MAJOR_SERVICE_INTERVAL_KM = 12000;
+
+const FIRST_SERVICE_TASKS = [
+  "Change engine oil",
+  "Replace oil filter",
+  "Inspect and lubricate drive chain",
+  "Check battery and electrical system",
+  "Inspect brakes",
+  "Check wheels and tires",
+  "Tighten bolts and fasteners",
+  "Inspect steering system",
+];
+
+const STANDARD_SERVICE_TASKS = [
+  "Change engine oil",
+  "Replace oil filter",
+  "Check throttle operation",
+  "Inspect/adjust cam chain",
+  "Inspect fuel system",
+  "Check/adjust clutch",
+  "Inspect and lubricate drive chain",
+  "Clean air filter",
+  "Check battery and electrical system",
+  "Inspect brakes",
+  "Check wheels and tires",
+  "Tighten bolts and fasteners",
+  "Inspect steering system",
+];
+
+const MAJOR_SERVICE_TASKS = [
+  "Change engine oil",
+  "Replace oil filter",
+  "Replace spark plug",
+  "Check/adjust valve clearance",
+  "Inspect/adjust cam chain",
+  "Inspect fuel system",
+  "Replace fuel filter",
+  "Run diagnostic check on throttle body / fuel injection system",
+  "Check/adjust clutch",
+  "Inspect and lubricate drive chain",
+  "Clean air filter",
+  "Check battery and electrical system",
+  "Inspect brakes",
+  "Check wheels and tires",
+  "Tighten bolts and fasteners",
+  "Inspect steering system",
 ];
 const OFF_ROAD_CHECKS = [
   {
@@ -227,11 +201,9 @@ function logCurrentService() {
     return;
   }
 
-  const completedService = [...SERVICES]
-    .reverse()
-    .find((service) => service.km <= currentKm);
+  const completedService = getLatestCompletedService(currentKm);
 
-  if (completedService === undefined) {
+  if (completedService === null) {
     showHistoryFeedback("No completed service is available at these kilometers.", "error");
     return;
   }
@@ -392,13 +364,7 @@ function isValidHistoryEntry(entry) {
 }
 
 function updateServiceStatus(currentKm) {
-  const nextService = SERVICES.find((service) => service.km >= currentKm);
-
-  if (nextService === undefined) {
-    remainingKmElement.textContent = `No upcoming service found`;
-    clearServiceUI();
-    return;
-  }
+  const nextService = getNextService(currentKm);
 
   const { title, km, tasks } = nextService;
 
@@ -407,11 +373,11 @@ function updateServiceStatus(currentKm) {
     remainingKmElement.textContent = `Service due now`;
     setRemainingKmStatus("due");
   } else {
-    remainingKmElement.textContent = `Remaining: ${remaining} km`;
+    remainingKmElement.textContent = `Remaining: ${remaining.toLocaleString("en-US")} km`;
     setRemainingKmStatus(remaining <= 1000 ? "warning" : "normal");
   }
 
-  nextServiceText.textContent = `Next service: ${km} km`;
+  nextServiceText.textContent = `Next service: ${km.toLocaleString("en-US")} km`;
 
   serviceTasks.textContent = "";
 
@@ -422,6 +388,55 @@ function updateServiceStatus(currentKm) {
   });
 
   tasksTitle.textContent = title;
+}
+
+function getNextService(currentKm) {
+  const serviceKm =
+    currentKm <= FIRST_SERVICE_KM
+      ? FIRST_SERVICE_KM
+      : Math.ceil(currentKm / SERVICE_INTERVAL_KM) * SERVICE_INTERVAL_KM;
+
+  return createService(serviceKm);
+}
+
+function getLatestCompletedService(currentKm) {
+  if (currentKm < FIRST_SERVICE_KM) {
+    return null;
+  }
+
+  const serviceKm =
+    currentKm < SERVICE_INTERVAL_KM
+      ? FIRST_SERVICE_KM
+      : Math.floor(currentKm / SERVICE_INTERVAL_KM) * SERVICE_INTERVAL_KM;
+
+  return createService(serviceKm);
+}
+
+function createService(serviceKm) {
+  return {
+    title: `${serviceKm.toLocaleString("en-US")} km service`,
+    km: serviceKm,
+    tasks: getServiceTasks(serviceKm),
+  };
+}
+
+function getServiceTasks(serviceKm) {
+  if (serviceKm === FIRST_SERVICE_KM) {
+    return [...FIRST_SERVICE_TASKS];
+  }
+
+  const tasks =
+    serviceKm % MAJOR_SERVICE_INTERVAL_KM === 0
+      ? MAJOR_SERVICE_TASKS
+      : STANDARD_SERVICE_TASKS;
+
+  if (serviceKm % AIR_FILTER_REPLACEMENT_INTERVAL_KM === 0) {
+    return tasks.map((task) =>
+      task === "Clean air filter" ? "Replace air filter" : task,
+    );
+  }
+
+  return [...tasks];
 }
 
 function clearServiceUI() {
