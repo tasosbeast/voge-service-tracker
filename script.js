@@ -119,6 +119,7 @@ const nextServiceText = document.querySelector("#next-service");
 const serviceTasks = document.querySelector("#service-tasks");
 const tasksTitle = document.querySelector("#tasks-title");
 const logServiceButton = document.querySelector("#log-service-btn");
+const undoServiceButton = document.querySelector("#undo-service-btn");
 const serviceHistory = document.querySelector("#service-history");
 const historyFeedback = document.querySelector("#history-feedback");
 let offRoadCloseTimeoutId = null;
@@ -129,6 +130,7 @@ renderHistory();
 
 updateServiceButton.addEventListener("click", handleServiceUpdate);
 logServiceButton.addEventListener("click", logCurrentService);
+undoServiceButton.addEventListener("click", undoLastService);
 
 offRoadCheckButton.addEventListener("click", () => {
   offRoadSuccess.textContent = "";
@@ -257,6 +259,8 @@ function logCurrentService() {
 }
 
 function renderHistory() {
+  undoServiceButton.disabled = bikeData.history.length === 0;
+
   if (bikeData.history.length === 0) {
     serviceHistory.innerHTML = '<li class="history-empty">No service history yet</li>';
     return;
@@ -275,6 +279,21 @@ function renderHistory() {
       `,
     )
     .join("");
+}
+
+function undoLastService() {
+  if (bikeData.history.length === 0) {
+    return;
+  }
+
+  bikeData = {
+    ...bikeData,
+    history: bikeData.history.slice(1),
+  };
+
+  persistBikeData();
+  renderHistory();
+  showHistoryFeedback("Last service entry removed.", "success");
 }
 
 function showHistoryFeedback(message, type) {

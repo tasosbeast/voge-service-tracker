@@ -242,6 +242,12 @@ p {
   margin-bottom: 0;
 }
 
+.history-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 #log-service-btn {
   flex-shrink: 0;
   border: 1px solid rgba(15, 118, 110, 0.28);
@@ -269,6 +275,39 @@ p {
 #log-service-btn:focus-visible {
   outline: 3px solid #99f6e4;
   outline-offset: 3px;
+}
+
+#undo-service-btn {
+  flex-shrink: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 11px 14px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+#undo-service-btn:hover:not(:disabled) {
+  border-color: #94a3b8;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+#undo-service-btn:focus-visible {
+  outline: 3px solid #cbd5e1;
+  outline-offset: 3px;
+}
+
+#undo-service-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
 }
 
 .history-feedback {
@@ -465,7 +504,13 @@ p {
     flex-direction: column;
   }
 
-  #log-service-btn {
+  .history-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  #log-service-btn,
+  #undo-service-btn {
     width: 100%;
   }
 

@@ -38,7 +38,10 @@
       <section class="history-panel" aria-labelledby="history-title">
         <div class="history-header">
           <h2 id="history-title">Service History</h2>
-          <button id="log-service-btn" type="button">Log Current Service</button>
+          <div class="history-actions">
+            <button id="undo-service-btn" type="button" disabled>Undo Last Entry</button>
+            <button id="log-service-btn" type="button">Log Current Service</button>
+          </div>
         </div>
         <p id="history-feedback" class="history-feedback" role="status" aria-live="polite"></p>
         <ul id="service-history" class="service-history"></ul>
