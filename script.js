@@ -101,6 +101,11 @@ const OFF_ROAD_CHECKS = [
   },
 ];
 const STORAGE_KEY = "bikeData";
+let bikeData = {
+  bike: "Voge 300 Rally",
+  currentKm: null,
+  history: [],
+};
 const updateServiceButton = document.querySelector("#update-btn");
 const offRoadCheckButton = document.querySelector("#off-road-check-btn");
 const offRoadDialog = document.querySelector("#off-road-dialog");
@@ -113,12 +118,17 @@ const remainingKmElement = document.querySelector("#remaining-km");
 const nextServiceText = document.querySelector("#next-service");
 const serviceTasks = document.querySelector("#service-tasks");
 const tasksTitle = document.querySelector("#tasks-title");
+const logServiceButton = document.querySelector("#log-service-btn");
+const serviceHistory = document.querySelector("#service-history");
+const historyFeedback = document.querySelector("#history-feedback");
 let offRoadCloseTimeoutId = null;
 
 renderOffRoadChecks();
 loadBikeData();
+renderHistory();
 
 updateServiceButton.addEventListener("click", handleServiceUpdate);
+logServiceButton.addEventListener("click", logCurrentService);
 
 offRoadCheckButton.addEventListener("click", () => {
   offRoadSuccess.textContent = "";
@@ -190,12 +200,93 @@ function handleServiceUpdate() {
 }
 
 function saveBikeData(currentKm) {
-  const bikeData = {
-    bike: "Voge 300 Rally",
+  bikeData = {
+    ...bikeData,
     currentKm,
   };
 
+  persistBikeData();
+}
+
+function persistBikeData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(bikeData));
+}
+
+function logCurrentService() {
+  const currentKm = Number(kmInput.value);
+
+  if (!Number.isFinite(currentKm) || currentKm <= 0) {
+    showHistoryFeedback("Enter valid current kilometers before logging a service.", "error");
+    return;
+  }
+
+  if (bikeData.history.some((entry) => entry.km === currentKm)) {
+    showHistoryFeedback("Service at these kilometers is already logged.", "error");
+    return;
+  }
+
+  const completedService = [...SERVICES]
+    .reverse()
+    .find((service) => service.km <= currentKm);
+
+  if (completedService === undefined) {
+    showHistoryFeedback("No completed service is available at these kilometers.", "error");
+    return;
+  }
+
+  const historyEntry = {
+    date: new Intl.DateTimeFormat("el-GR", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(new Date()),
+    km: currentKm,
+    type: completedService.title,
+  };
+
+  bikeData = {
+    ...bikeData,
+    currentKm,
+    history: [historyEntry, ...bikeData.history],
+  };
+
+  persistBikeData();
+  updateServiceStatus(currentKm);
+  renderHistory();
+  showHistoryFeedback("Service added to history.", "success");
+}
+
+function renderHistory() {
+  if (bikeData.history.length === 0) {
+    serviceHistory.innerHTML = '<li class="history-empty">No service history yet</li>';
+    return;
+  }
+
+  serviceHistory.innerHTML = bikeData.history
+    .map(
+      (entry) => `
+        <li class="history-item">
+          <div class="history-item-copy">
+            <strong>${escapeHtml(entry.type)}</strong>
+            <time>${escapeHtml(entry.date)}</time>
+          </div>
+          <span class="history-km">${entry.km.toLocaleString("en-US")} km</span>
+        </li>
+      `,
+    )
+    .join("");
+}
+
+function showHistoryFeedback(message, type) {
+  historyFeedback.textContent = message;
+  historyFeedback.classList.remove("error", "success");
+  historyFeedback.classList.add(type);
+}
+
+function escapeHtml(value) {
+  const element = document.createElement("div");
+  element.textContent = value;
+  return element.innerHTML;
 }
 
 function renderOffRoadChecks() {
@@ -239,24 +330,46 @@ function areAllOffRoadChecksComplete() {
 function loadBikeData() {
   const savedBikeData = localStorage.getItem(STORAGE_KEY);
 
-  if (savedBikeData !== null) {
-    try {
-      const parsedBikeData = JSON.parse(savedBikeData);
-      const savedKm = parsedBikeData.currentKm;
-      if (
-        typeof savedKm !== "number" ||
-        Number.isNaN(savedKm) ||
-        savedKm <= 0
-      ) {
-        localStorage.removeItem(STORAGE_KEY);
-      } else {
-        kmInput.value = savedKm;
-        updateServiceStatus(savedKm);
-      }
-    } catch (error) {
-      localStorage.removeItem(STORAGE_KEY);
-    }
+  if (savedBikeData === null) {
+    return;
   }
+
+  try {
+    const parsedBikeData = JSON.parse(savedBikeData);
+    const savedKm =
+      Number.isFinite(parsedBikeData.currentKm) && parsedBikeData.currentKm > 0
+        ? parsedBikeData.currentKm
+        : null;
+    const history = Array.isArray(parsedBikeData.history)
+      ? parsedBikeData.history.filter(isValidHistoryEntry)
+      : [];
+
+    bikeData = {
+      bike: "Voge 300 Rally",
+      currentKm: savedKm,
+      history,
+    };
+
+    persistBikeData();
+
+    if (savedKm !== null) {
+      kmInput.value = savedKm;
+      updateServiceStatus(savedKm);
+    }
+  } catch (error) {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}
+
+function isValidHistoryEntry(entry) {
+  return (
+    entry !== null &&
+    typeof entry === "object" &&
+    typeof entry.date === "string" &&
+    Number.isFinite(entry.km) &&
+    entry.km > 0 &&
+    typeof entry.type === "string"
+  );
 }
 
 function updateServiceStatus(currentKm) {
