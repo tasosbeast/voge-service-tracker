@@ -16,16 +16,22 @@ body {
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  background:
-    linear-gradient(rgba(15, 23, 42, 0.74), rgba(15, 23, 42, 0.58)),
-    url("https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1600&q=80");
-  background-size: cover;
-  background-position: center;
+  background: #0f172a;
   color: #172033;
   padding: 24px;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("icon.svg") center / min(72vw, 560px) no-repeat;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
 .tracker-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 18px;
