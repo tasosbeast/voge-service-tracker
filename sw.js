@@ -1,4 +1,4 @@
-const CACHE_NAME = "voge-tracker-v1";
+const CACHE_NAME = "voge-tracker-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
