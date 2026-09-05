@@ -1,0 +1,333 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background:
+    linear-gradient(rgba(15, 23, 42, 0.74), rgba(15, 23, 42, 0.58)),
+    url("https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1600&q=80");
+  background-size: cover;
+  background-position: center;
+  color: #172033;
+  padding: 24px;
+}
+
+.tracker-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 680px;
+  padding: 28px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: rgba(2, 6, 23, 0.34) 0px 24px 70px;
+  backdrop-filter: blur(10px);
+}
+
+.tracker-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.eyebrow {
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  max-width: 520px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #475569;
+}
+
+.input-panel,
+.status-panel,
+.tasks-panel {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 18px;
+}
+
+.input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 800;
+  color: #334155;
+}
+
+#km-input {
+  width: 100%;
+  padding: 14px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 16px;
+  outline: none;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+#km-input:focus {
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: #bfdbfe 0px 0px 0px 4px;
+}
+
+#update-btn {
+  padding: 0 22px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 0;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  box-shadow: rgba(239, 68, 68, 0.32) 0px 10px 22px;
+}
+
+#update-btn:hover {
+  background: #dc2626;
+}
+
+#off-road-check-btn {
+  width: 100%;
+  padding: 13px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  color: #c2410c;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+#off-road-check-btn:hover {
+  background: #ffedd5;
+}
+
+.status-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: #f8fafc;
+}
+
+h1 {
+  font-size: 44px;
+  line-height: 1;
+  color: #0f172a;
+}
+
+h2 {
+  font-size: 22px;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+p {
+  font-size: 15px;
+  color: #475569;
+}
+
+#remaining-km,
+#next-service {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 14px;
+  font-size: 17px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+#remaining-km.normal {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+#remaining-km.warning {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+#remaining-km.due {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.success-message {
+  min-height: 0;
+  border-radius: 14px;
+  background: #ecfdf5;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #047857;
+}
+
+.success-message:not(:empty) {
+  padding: 14px;
+}
+
+#service-tasks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-left: 0;
+  color: #334155;
+  list-style: none;
+}
+
+#service-tasks li {
+  line-height: 1.45;
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.off-road-dialog {
+  margin: auto;
+  width: min(92vw, 560px);
+  border: 1px solid rgba(226, 232, 240, 0.72);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 0;
+  color: #172033;
+  box-shadow: rgba(2, 6, 23, 0.42) 0px 28px 80px;
+  backdrop-filter: blur(12px);
+}
+
+.off-road-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.dialog-header h2 {
+  margin-bottom: 0;
+}
+
+.icon-button {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.icon-button:hover {
+  background: #e2e8f0;
+}
+
+.dialog-copy {
+  line-height: 1.5;
+}
+
+.off-road-checklist {
+  display: grid;
+  gap: 10px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.off-road-checklist li {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.off-road-checklist label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.off-road-checklist input {
+  width: 18px;
+  height: 18px;
+  accent-color: #ef4444;
+}
+
+.off-road-checklist input:checked + span {
+  color: #64748b;
+  text-decoration: line-through;
+}
+
+@media (max-width: 620px) {
+  .tracker-card {
+    padding: 18px;
+  }
+
+  .input-row,
+  .status-panel,
+  #service-tasks {
+    grid-template-columns: 1fr;
+  }
+
+  #update-btn {
+    padding: 14px 18px;
+  }
+
+  h1 {
+    font-size: 34px;
+  }
+}

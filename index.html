@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Voge Service Tracker</title>
+  </head>
+  <body>
+    <main class="tracker-card">
+      <header class="tracker-header">
+        <p class="eyebrow">Maintenance tracker</p>
+        <h1>Voge 300 Rally</h1>
+        <p class="subtitle">Find the next service and the checklist for your current mileage.</p>
+      </header>
+
+      <section class="input-panel" aria-label="Current motorcycle kilometers">
+        <label for="km-input">Current km</label>
+        <div class="input-row">
+          <input id="km-input" type="number" min="1" placeholder="Enter current km" />
+          <button id="update-btn" type="button">Update</button>
+        </div>
+        <button id="off-road-check-btn" type="button">Off-Road Check</button>
+      </section>
+
+      <section class="status-panel" aria-live="polite">
+        <p id="remaining-km"></p>
+        <p id="next-service"></p>
+      </section>
+
+      <p id="off-road-success" class="success-message" aria-live="polite"></p>
+
+      <section class="tasks-panel">
+        <h2 id="tasks-title"></h2>
+        <ul id="service-tasks"></ul>
+      </section>
+    </main>
+
+    <dialog id="off-road-dialog" class="off-road-dialog">
+      <div class="dialog-content">
+        <header class="dialog-header">
+          <div>
+            <p class="eyebrow">After ride</p>
+            <h2>Off-Road Check</h2>
+          </div>
+          <button id="close-off-road-dialog" class="icon-button" type="button" aria-label="Close off-road check">
+            X
+          </button>
+        </header>
+
+        <p class="dialog-copy">Quick checks after dirt, mud, rocks or water crossings.</p>
+        <ul id="off-road-checklist" class="off-road-checklist"></ul>
+      </div>
+    </dialog>
+
+    <script src="script.js"></script>
+  </body>
+</html>
